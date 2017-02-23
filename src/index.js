@@ -48,28 +48,26 @@ class Plugin {
         this.serverless.service.provider.compiledCloudFormationTemplate.Resources.cloudwatchLogsLambdaPermission = cloudwatchLogsLambdaPermission;
 
         this.serverless.service.getAllFunctions().forEach((functionName) => {
-            if (functionName !== 'sumologicShipping') {
-                const functionObj = this.serverless.service.getFunction(functionName);
+            const functionObj = this.serverless.service.getFunction(functionName);
 
-                // We will be able to do this soon
-                // const logGroupLogicalId = this.provider.naming.getLogGroupLogicalId(functionName);
+            // We will be able to do this soon
+            // const logGroupLogicalId = this.provider.naming.getLogGroupLogicalId(functionName);
 
-                const logGroupLogicalId = getLogGroupLogicalId(functionName)
+            const logGroupLogicalId = getLogGroupLogicalId(functionName)
 
-                let filterStatement = filterBaseStatement;
+            let filterStatement = filterBaseStatement;
 
-                filterStatement.Properties.LogGroupName = `/aws/lambda/${functionObj.name}`;
+            filterStatement.Properties.LogGroupName = `/aws/lambda/${functionObj.name}`;
 
-                let filterStatementName = functionName + 'SumoLogicSubscriptionFilter';
+            let filterStatementName = functionName + 'SumoLogicSubscriptionFilter';
 
-                filterStatement.DependsOn.push(logGroupLogicalId);
+            filterStatement.DependsOn.push(logGroupLogicalId);
 
-                let newFilterStatement = {
-                    [`${filterStatementName}`]: filterStatement
-                };
+            let newFilterStatement = {
+                [`${filterStatementName}`]: filterStatement
+            };
 
-                _.merge(this.serverless.service.provider.compiledCloudFormationTemplate.Resources, newFilterStatement);
-            }
+            _.merge(this.serverless.service.provider.compiledCloudFormationTemplate.Resources, newFilterStatement);
         });
     }
 
